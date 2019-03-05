@@ -1,15 +1,27 @@
 import { Inject, Service } from "typedi";
 import { EntityManager } from "typeorm";
-import { Review, ReviewInput } from "./model";
+import { Comment, CommentInput } from "./model";
+import { Post } from "../post/model";
 
-@Service("ReviewService")
-export default class ReviewService {
+@Service()
+export default class CommentService {
     @Inject("EntityManager")
     public entityManager: EntityManager;
 
-    public createReview(review: ReviewInput): Promise<Review> {
-        const createdReview = this.entityManager.create(Review, review);
+    public createComment(comment: CommentInput, post: Post): Promise<Comment> {
+        const createdComment = this.entityManager.create(Comment, comment);
 
-        return this.entityManager.save(Review, createdReview);
+        return this.entityManager.save(Comment, {
+            ...createdComment,
+            post,
+        });
+    }
+
+    public updateComment(comment: CommentInput): Promise<any> {
+        return this.entityManager.update(Comment, comment.id, comment);
+    }
+
+    public deleteComment(commentId: string): Promise<any> {
+        return this.entityManager.delete(Comment, commentId);
     }
 }

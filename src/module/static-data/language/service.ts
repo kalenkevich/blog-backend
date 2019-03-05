@@ -2,7 +2,7 @@ import { Inject, Service } from "typedi";
 import { EntityManager } from "typeorm";
 import { Language, LanguageInput } from "./model";
 
-@Service("LanguageService")
+@Service()
 export class LanguageService {
     @Inject("EntityManager")
     public entityManager: EntityManager;

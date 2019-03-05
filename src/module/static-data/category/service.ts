@@ -2,7 +2,7 @@ import { Inject, Service } from "typedi";
 import { EntityManager } from "typeorm";
 import { Category, CategoryInput } from "./model";
 
-@Service("CategoryService")
+@Service()
 export class CategoryService {
     @Inject("EntityManager")
     public entityManager: EntityManager;

@@ -6,10 +6,10 @@ import { LanguageService } from "./service";
 
 @Resolver(Language)
 export default class LanguageResolver {
-    @Inject("LanguageService")
+    @Inject()
     public languageService: LanguageService;
 
-    @Inject("Logger")
+    @Inject()
     public logger: Logger;
 
     @Query((returns) => [Language])

@@ -1,4 +1,5 @@
-import * as lodash from 'lodash';
+import lodash from 'lodash';
+import { Container } from 'typedi';
 import DefaultSettings from './default';
 import LocalSettings from './local';
 import DevSettings from './development';
@@ -12,7 +13,7 @@ export const ENVIRONMENTS = {
     PRODUCTION: 'production',
 };
 
-export const getEnvSettings = (env) => {
+export const getEnvSettings = (env: string) => {
     switch (env) {
         case ENVIRONMENTS.LOCAL: return LocalSettings;
         case ENVIRONMENTS.DEVELOPMENT: return DevSettings;
@@ -22,7 +23,7 @@ export const getEnvSettings = (env) => {
     }
 };
 
-export const getParseValue = val => {
+export const getParseValue = (val: string) => {
     if (lodash.isFinite(+val)) {
         return +val;
     }
@@ -34,14 +35,14 @@ export const getParseValue = val => {
     if (val === 'false') {
         return false;
     }
-    
+
     return val;
 };
 
-export const getObjectFromProcessEnv = (processEnv) => 
-    Object.keys(processEnv || {}).reduce((config, key) => {
+export const getObjectFromProcessEnv = (processEnv: any) =>
+    Object.keys(processEnv || {}).reduce((config, key: string) => {
         lodash.set(config, key, getParseValue(processEnv[key]));
-        
+
         return config;
     }, {});
 
@@ -49,9 +50,13 @@ export const currentEnv = process.env.ENVIRONMENT;
 
 export const currentProcessEnv = process.env;
 
-export default {
+export const ResultSettings = {
     ...DefaultSettings,
     ...getEnvSettings(currentEnv),
     ...getObjectFromProcessEnv(currentProcessEnv),
 };
+
+Container.set('settings', ResultSettings);
+
+export default ResultSettings;
 

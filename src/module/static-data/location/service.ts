@@ -2,7 +2,7 @@ import { Inject, Service } from "typedi";
 import { EntityManager } from "typeorm";
 import { Location, LocationInput } from "./model";
 
-@Service("LocationService")
+@Service()
 export class LocationService {
     @Inject("EntityManager")
     public entityManager: EntityManager;

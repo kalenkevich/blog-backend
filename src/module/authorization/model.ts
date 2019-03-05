@@ -1,5 +1,5 @@
 import { Field, InputType } from "type-graphql";
-import { UserRole } from "../core/user/role";
+import { UserRole } from "../user/role";
 
 @InputType()
 export class UserSignInInput {

@@ -1,5 +1,5 @@
 import DatabaseConnector from "./interface";
-import PostgresDBConnector from "./postgres";
+import MongoDBConnector from "./mongodb";
 
 export { DatabaseConnector };
-export { PostgresDBConnector };
+export { MongoDBConnector };

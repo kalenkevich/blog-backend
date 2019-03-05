@@ -1,33 +1,41 @@
 import { Field, ID, InputType, ObjectType } from "type-graphql";
-import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { CustomerProfile } from "../../customer/profile/model";
-import { ContractorProfile } from "../profile/model";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { User } from "../user/model";
+import {Post} from "../post/model";
 
 @InputType()
-export class ReviewInput implements Partial<Review> {
+export class CommentInput implements Partial<Comment> {
+    @Field(type => ID, { nullable: true })
+    id: string;
+
     @Field()
-    public content: string;
+    content: string;
 }
 
 @ObjectType()
-@Entity("reviews")
-export class Review {
+@Entity("comment")
+export class Comment {
     @Field((type) => ID)
     @PrimaryGeneratedColumn()
-    public id: number;
+    id: string;
 
     @Column()
     @Field()
-    public content: string;
+    content: string;
 
     @Column()
     @Field()
-    public date: Date;
+    creationDate: Date;
 
-    @Field((type) => CustomerProfile)
-    @ManyToOne((type) => CustomerProfile)
-    public owner: CustomerProfile;
+    @Column()
+    @Field()
+    rate: number;
 
-    @ManyToOne((type) => ContractorProfile, (profile) => profile.reviews)
-    public profile: ContractorProfile;
+    @Field((type) => User)
+    @ManyToOne((type) => User)
+    author: User;
+
+    @Field(type => Post)
+    @ManyToOne(type => Post, post => post.comments, { nullable: true })
+    post: Post;
 }

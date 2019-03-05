@@ -1,25 +1,22 @@
 import { ApolloError } from "apollo-error";
 import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { Inject } from "typedi";
+import { Request, Response } from "express";
 import Logger from "../../connector/logger";
-import { SlackService } from "../../connector/slack";
-import { User } from "../core/user/model";
+import { User } from "../user/model";
 import { UserSignInInput, UserSignUpInput } from "./model";
 import AuthorizationService from "./service";
 
 @Resolver(User)
 export default class AuthorizationResolver {
-    @Inject("AuthorizationService")
+    @Inject()
     public authorizationService: AuthorizationService;
 
-    @Inject("Logger")
+    @Inject()
     public logger: Logger;
 
-    @Inject("SlackService")
-    public slackService: SlackService;
-
     @Mutation((returns) => User)
-    public async signIn(@Arg("signInData") signInData: UserSignInInput, @Ctx("response") res) {
+    public async signIn(@Arg("signInData") signInData: UserSignInInput, @Ctx("response") res: Response) {
         try {
             const user = await this.authorizationService.signIn(signInData);
 
@@ -36,7 +33,7 @@ export default class AuthorizationResolver {
     }
 
     @Mutation((returns) => User)
-    public async signUp(@Arg("signUpData") signUpData: UserSignUpInput, @Ctx("response") res) {
+    public async signUp(@Arg("signUpData") signUpData: UserSignUpInput, @Ctx("response") res: Response) {
         try {
             const user = await this.authorizationService.signUp(signUpData);
 
@@ -53,7 +50,7 @@ export default class AuthorizationResolver {
     }
 
     @Query((returns) => User)
-    public async authorize(@Ctx("request") req) {
+    public async authorize(@Ctx("request") req: Request) {
         try {
             const { token } = req.cookies;
             const user = await this.authorizationService.authenticate(token);
@@ -69,7 +66,7 @@ export default class AuthorizationResolver {
     }
 
     @Query((returns) => Boolean)
-    public async signOut(@Ctx("token") token, @Ctx("response") res) {
+    public async signOut(@Ctx("token") token: string, @Ctx("response") res: Response) {
         try {
             await this.authorizationService.signOut(token);
 

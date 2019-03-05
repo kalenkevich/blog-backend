@@ -6,10 +6,10 @@ import { CategoryService } from "./service";
 
 @Resolver(Category)
 export default class CategoryResolver {
-    @Inject("CategoryService")
+    @Inject()
     public categoryService: CategoryService;
 
-    @Inject("Logger")
+    @Inject()
     public logger: Logger;
 
     @Query((returns) => Category)

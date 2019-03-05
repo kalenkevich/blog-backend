@@ -6,10 +6,10 @@ import { LocationService } from "./service";
 
 @Resolver(Location)
 export default class LocationResolver {
-    @Inject("LocationService")
+    @Inject()
     public locationService: LocationService;
 
-    @Inject("Logger")
+    @Inject()
     public logger: Logger;
 
     @Query((returns) => [Location])

@@ -2,17 +2,17 @@ import { ApolloError } from "apollo-error";
 import * as bcrypt from "bcrypt-nodejs";
 import * as jwt from "jsonwebtoken";
 import { Inject, Service } from "typedi";
-import Config from "../../../config/settings";
-import { User } from "../core/user/model";
-import { UserService } from "../core/user/service";
-import { UserSignUpInput } from "./model";
+import { User } from "../user/model";
+import { UserService } from "../user/service";
+import { UserSignInInput, UserSignUpInput } from "./model";
 
-const { tokenSecret } = Config;
-
-@Service("AuthorizationService")
+@Service()
 export default class AuthorizationService {
-    @Inject("UserService")
+    @Inject()
     public userService: UserService;
+
+    @Inject("settings")
+    settings: any;
 
     public async signUp(signUpData: UserSignUpInput): Promise<User> {
         const existingUser = await this.userService.getUser({
@@ -29,7 +29,7 @@ export default class AuthorizationService {
         return this.signIn(signUpData);
     }
 
-    public async signIn({ email, password }): Promise<User> {
+    public async signIn({ email, password }: UserSignInInput): Promise<User> {
         const user = await this.userService.getUser({ email });
 
         if (user) {
@@ -51,7 +51,7 @@ export default class AuthorizationService {
 
     public async regenerateToken(user: User): Promise<string> {
         const { id, email } = user;
-        const token = await jwt.sign({id, email}, tokenSecret);
+        const token = await jwt.sign({id, email}, this.settings.TokenSecret);
 
         await this.userService.createUser({ ...user, token });
 
@@ -71,6 +71,6 @@ export default class AuthorizationService {
     public async signOut(token: string) {
         const user = await this.userService.getUser({ token });
 
-        return this.userService.removeToken(user);
+        return this.userService.removeToken(user.id);
     }
 }

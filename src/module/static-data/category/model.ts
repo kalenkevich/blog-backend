@@ -8,7 +8,7 @@ export class CategoryInput implements Partial<Category> {
     public value: string;
 
     @Column()
-    @Field()
+    @Field({ nullable: true })
     public nameKey: string;
 }
 
