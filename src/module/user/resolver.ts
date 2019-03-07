@@ -13,9 +13,9 @@ export default class UserResolver {
     public userService: UserService;
 
     @Query((returns) => User)
-    public async getUser(@Arg("id") id: string) {
+    public async getUser(@Arg("userId") userId: number) {
         try {
-            const result = await this.userService.getUser(id);
+            const result = await this.userService.getUser(userId);
 
             this.logger.info(`Successfully fetched user ${result.name}`);
 

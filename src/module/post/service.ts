@@ -1,6 +1,6 @@
 import { Inject, Service } from "typedi";
 import { getRepository, Repository } from "typeorm";
-import { Post, PostInput } from "./model";
+import { Post, PostInput, PostPreview } from "./model";
 import { CommentInput } from "../comment/model";
 import { UserService } from "../user/service";
 import { User } from "../user/model";
@@ -18,14 +18,27 @@ export default class PostService {
 
     public getPost(postId: number): Promise<Post> {
         return this.repository.findOne(postId, {
-            relations: ['author'],
+            relations: ['author', 'comments'],
         });
     }
 
-    public getAllPosts(): Promise<Post[]> {
-        return this.repository.find({
-            relations: ['author'],
+    public async getAllPosts(): Promise<PostPreview[]> {
+        const posts = await this.repository.find({
+            relations: ['author', 'comments'],
         });
+
+        return this.getPostsPreview(posts);
+    }
+
+    public async getUserPosts(authorId: number): Promise<PostPreview[]> {
+        const posts = await this.repository.find({
+            relations: ['author', 'comments'],
+            where: {
+                "authorId": { value: authorId },
+            },
+        });
+
+        return this.getPostsPreview(posts);
     }
 
     public async createPost(post: PostInput, user: User): Promise<Post> {
@@ -50,5 +63,23 @@ export default class PostService {
         const post = await this.getPost(postId);
 
         return this.commentService.createComment(comment, post);
+    }
+
+    private getPostsPreview(posts: Post[]):PostPreview[] {
+        return posts.map(({ id, content, comments, author, categories, creationDate, rate, title }) => {
+            const commentsCount = (comments || []).length;
+            const contentPreview = content.slice(0, 100);
+
+            return {
+                id,
+                contentPreview,
+                commentsCount,
+                author,
+                categories,
+                creationDate,
+                rate,
+                title,
+            };
+        });
     }
 }

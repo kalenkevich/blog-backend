@@ -54,3 +54,30 @@ export class Post {
     @Field()
     creationDate: Date;
 }
+
+@ObjectType()
+export class PostPreview {
+    @Field((type) => ID)
+    id: number;
+
+    @Field()
+    title: string;
+
+    @Field()
+    contentPreview: string;
+
+    @Field(type => User)
+    author: User;
+
+    @Field()
+    rate: number;
+
+    @Field(type => [Category], { nullable: true })
+    categories: Category[];
+
+    @Field()
+    commentsCount: number;
+
+    @Field()
+    creationDate: Date;
+}

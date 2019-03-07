@@ -1,7 +1,6 @@
 import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { Inject } from "typedi";
-import { ObjectID } from "typeorm";
-import { Post, PostInput } from "./model";
+import { Post, PostInput, PostPreview } from "./model";
 import { User } from "../user/model";
 import PostService from "./service";
 import Logger from "../../connector/logger";
@@ -20,7 +19,7 @@ export default class PostResolver {
     @Inject()
     private logger: Logger;
 
-    @Query((returns) => [Post], { nullable: true })
+    @Query((returns) => [PostPreview], { nullable: true })
     public async getAllPosts() {
         try {
             return this.postService.getAllPosts();
@@ -125,6 +124,17 @@ export default class PostResolver {
             this.logger.trace(`Successfully deleted comment: ${commentId} by user: ${user.id} ${user.email}`);
 
             return OperationResult.createSuccessResult();
+        } catch (error) {
+            this.logger.error(error);
+
+            throw error;
+        }
+    }
+
+    @Query((returns) => [PostPreview])
+    public async getUserPosts(@Arg("userId") userId: number,) {
+        try {
+            return this.postService.getUserPosts(userId);
         } catch (error) {
             this.logger.error(error);
 
