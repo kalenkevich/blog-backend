@@ -1,27 +1,26 @@
-import { Inject, Service } from "typedi";
-import { EntityManager } from "typeorm";
+import { Service } from "typedi";
+import { DeleteResult, getRepository, Repository, UpdateResult} from "typeorm";
 import { Comment, CommentInput } from "./model";
 import { Post } from "../post/model";
 
 @Service()
 export default class CommentService {
-    @Inject("EntityManager")
-    public entityManager: EntityManager;
+    private repository: Repository<Comment> = getRepository(Comment);
 
     public createComment(comment: CommentInput, post: Post): Promise<Comment> {
-        const createdComment = this.entityManager.create(Comment, comment);
+        const createdComment = this.repository.create(comment);
 
-        return this.entityManager.save(Comment, {
+        return this.repository.save({
             ...createdComment,
             post,
         });
     }
 
-    public updateComment(comment: CommentInput): Promise<any> {
-        return this.entityManager.update(Comment, comment.id, comment);
+    public updateComment(comment: CommentInput): Promise<UpdateResult> {
+        return this.repository.update(comment.id, comment);
     }
 
-    public deleteComment(commentId: string): Promise<any> {
-        return this.entityManager.delete(Comment, commentId);
+    public deleteComment(commentId: number): Promise<DeleteResult> {
+        return this.repository.delete(commentId);
     }
 }

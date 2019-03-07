@@ -4,20 +4,20 @@ import { User } from "../user/model";
 import {Post} from "../post/model";
 
 @InputType()
-export class CommentInput implements Partial<Comment> {
+export class CommentInput {
     @Field(type => ID, { nullable: true })
-    id: string;
+    id: number;
 
     @Field()
     content: string;
 }
 
 @ObjectType()
-@Entity("comment")
+@Entity("comments")
 export class Comment {
     @Field((type) => ID)
     @PrimaryGeneratedColumn()
-    id: string;
+    id: number;
 
     @Column()
     @Field()

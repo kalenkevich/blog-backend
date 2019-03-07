@@ -1,5 +1,5 @@
 import { Field, InputType, ObjectType } from "type-graphql";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn } from "typeorm";
 
 @InputType()
 export class CategoryInput implements Partial<Category> {
@@ -15,10 +15,7 @@ export class CategoryInput implements Partial<Category> {
 @Entity("categories")
 @ObjectType()
 export class Category {
-    @PrimaryGeneratedColumn()
-    public id: number;
-
-    @Column()
+    @PrimaryColumn()
     @Field()
     public value: string;
 

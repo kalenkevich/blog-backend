@@ -1,11 +1,11 @@
 import { Field, ID, InputType, ObjectType } from "type-graphql";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn} from "typeorm";
 import { UserRole } from "./role";
 
 @InputType()
 export class UserInput {
     @Field((type) => ID, { nullable: true })
-    public id: string;
+    public id: number;
 
     @Field()
     public name: string;
@@ -25,7 +25,7 @@ export class UserInput {
 export class User {
     @Field((type) => ID)
     @PrimaryGeneratedColumn()
-    public id: string;
+    public id: number;
 
     @Column()
     @Field()
@@ -35,24 +35,24 @@ export class User {
     @Field()
     public email: string;
 
-    @Column()
-    @Field()
+    @Column({ nullable: true })
+    @Field({ nullable: true })
     public phone: string;
 
-    @Column()
-    @Field((type) => [UserRole])
-    public roles: UserRole[];
+    @Column({ default: UserRole.user })
+    @Field((type) => UserRole)
+    public role: UserRole;
 
     @Column()
     public password: string;
 
     @Column({ default: true })
-    public active: boolean;
+    public active: boolean = true;
 
     @Column({ nullable: true })
     public token: string;
 
     @Column({ default: "" })
-    @Field()
+    @Field({ defaultValue: "" })
     public avatarUrl: string;
 }

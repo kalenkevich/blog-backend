@@ -1,51 +1,51 @@
 import bcrypt from "bcrypt-nodejs";
-import { Inject, Service } from "typedi";
-import { EntityManager, UpdateResult } from "typeorm";
-import { UserRole } from "./role";
+import { Service } from "typedi";
+import { getRepository, Repository, UpdateResult} from "typeorm";
 import { User, UserInput } from "./model";
 
 @Service()
 export class UserService {
-    @Inject("EntityManager")
-    public entityManager: EntityManager;
+    private repository: Repository<User> = getRepository(User);
 
     public async getUser(selectOptions: any): Promise<User> {
-        return this.entityManager.findOne(User, selectOptions);
+        return this.repository.findOne(selectOptions);
     }
 
     public getAllUsers() {
-        return this.entityManager.find(User);
+        return this.repository.find();
     }
 
-    public createUser(userData: any): Promise<User> {
-        const createdUser = this.entityManager.create(User, {
-            ...userData,
-            role: UserRole[userData.role],
-        });
+    public async createUser(userData: any): Promise<User> {
+        const createdUser = this.repository.create(userData);
+        const result = await this.repository.save(createdUser);
 
-        return this.entityManager.save(createdUser);
+        return result[0];
     }
 
     public updateUser(user: UserInput): Promise<UpdateResult> {
-        return this.entityManager.update(User, user.id, {...user});
+        return this.repository.update(user.id, {...user});
     }
 
-    public removeToken(userId: string): Promise<UpdateResult> {
-        return this.entityManager.update(User, userId, {token: null});
+    public setToken(userId: number, token: string) {
+        return this.repository.update(userId, { token });
     }
 
-    public async changePassword(userId: string, oldPassword: string, newPassword: string): Promise<UpdateResult | boolean> {
+    public removeToken(userId: number): Promise<UpdateResult> {
+        return this.repository.update(userId, { token: null });
+    }
+
+    public async changePassword(userId: number, oldPassword: string, newPassword: string): Promise<UpdateResult | boolean> {
         const user = await this.getUser({ id: userId });
         const isValidPassword = bcrypt.compareSync(oldPassword, user.password);
 
         if (isValidPassword) {
-            return this.entityManager.update(User, userId, { password: newPassword });
+            return this.repository.update(userId, { password: newPassword });
         }
 
         return false;
     }
 
-    public changePhone(userId: string, phone: string): Promise<UpdateResult> {
-        return this.entityManager.update(User, userId, { phone });
+    public changePhone(userId: number, phone: string): Promise<UpdateResult> {
+        return this.repository.update(userId, { phone });
     }
 }

@@ -1,13 +1,13 @@
 import { Field, ID, InputType, ObjectType } from "type-graphql";
-import {Column, Entity, ManyToMany, ObjectID, ObjectIdColumn} from "typeorm";
+import { Column, Entity, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "../user/model";
-import { Category, CategoryInput } from "../static-data/category/model";
+import { Category, CategoryInput } from "../category/model";
 import { Comment } from "../comment/model";
 
 @InputType()
-export class PostInput implements Partial<Post> {
+export class PostInput {
     @Field(type => ID, { nullable: true })
-    public id: ObjectID;
+    public id: number;
 
     @Field()
     public title: string;
@@ -19,12 +19,12 @@ export class PostInput implements Partial<Post> {
     public categories: Category[];
 }
 
-@Entity("post")
+@Entity("posts")
 @ObjectType()
 export class Post {
     @Field((type) => ID)
-    @ObjectIdColumn()
-    id: ObjectID;
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @Column()
     @Field()
@@ -34,19 +34,19 @@ export class Post {
     @Field()
     content: string;
 
-    @Column(type => User)
     @Field(type => User)
-    user: User;
+    @ManyToOne(type => User, { cascade: true })
+    author: User;
 
-    @Column()
-    @Field({ defaultValue: 3.0 })
+    @Column({ default: 0.0 })
+    @Field()
     rate: number;
 
     @ManyToMany(type => Category)
-    @Field(type => [Category])
+    @Field(type => [Category], { nullable: true })
     categories: Category[];
 
-    @Column({ nullable: true })
+    @ManyToOne(type => Comment, comment => comment.post, { nullable: true })
     @Field((type) => [Comment], { nullable: true })
     comments?: Comment[];
 

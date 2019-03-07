@@ -1,12 +1,14 @@
 import "reflect-metadata";
-import { useContainer } from "type-graphql";
 import { Container } from "typedi";
+import { useContainer as useTypeGraphQLContainer } from "type-graphql";
+import { useContainer as useClassValidatorContainer } from 'class-validator';
 import ApplicationServer from "./application";
 import settings from "../config/settings";
 
 Container.set("settings", settings);
 
-useContainer(Container);
+useTypeGraphQLContainer(Container);
+useClassValidatorContainer(Container);
 
 (async () => {
     const server = Container.get(ApplicationServer);

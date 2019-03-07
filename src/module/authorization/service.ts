@@ -36,7 +36,7 @@ export default class AuthorizationService {
             const isValidPassword = bcrypt.compareSync(password, user.password);
 
             if (!isValidPassword) {
-                throw new ApolloError("email or password is invalid", 401);
+                throw new ApolloError("Email or password is invalid", 401);
             } else if (!user.active) {
                 throw new ApolloError("Account is not yet activated. Please check your e-mail for activation link.", 401);
             } else {
@@ -45,7 +45,7 @@ export default class AuthorizationService {
                 return this.authenticate(token);
             }
         } else {
-            throw new ApolloError("email or password is invalid", 401);
+            throw new ApolloError("Email or password is invalid", 401);
         }
     }
 
@@ -53,16 +53,20 @@ export default class AuthorizationService {
         const { id, email } = user;
         const token = await jwt.sign({id, email}, this.settings.TokenSecret);
 
-        await this.userService.createUser({ ...user, token });
+        await this.userService.setToken(user.id, token);
 
         return token;
     }
 
     public async authenticate(token: string): Promise<User> {
+        if (!token) {
+            throw new ApolloError("Provided token is not defined", 401);
+        }
+
         const user = await this.userService.getUser({ token });
 
         if (!user) {
-            throw new ApolloError("can't authorize with provided token", 401);
+            throw new ApolloError("Can't authorize with provided token", 401);
         }
 
         return user;

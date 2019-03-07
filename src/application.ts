@@ -6,7 +6,7 @@ import {Container, Inject, Service} from "typedi";
 import { Application } from "express";
 import { buildSchema } from "type-graphql";
 import { ApolloServer } from "apollo-server-express";
-import { MongoDBConnector } from "./connector/database";
+import { PostgressConnector } from "./connector/database";
 import { resolvers } from "./graphql";
 import { User } from "./module/user/model";
 import { UserRole } from "./module/user/role";
@@ -20,7 +20,7 @@ export default class ApplicationServer {
     private logger: Logger;
 
     @Inject()
-    private dbConnector: MongoDBConnector;
+    private dbConnector: PostgressConnector;
 
     private server: ApolloServer;
 
@@ -95,7 +95,7 @@ export default class ApplicationServer {
     private async init() {
         try {
             await this.initDatabase();
-            this.logger.info(`Successfully connected to the database: ${this.settings.Database.Url}`);
+            this.logger.info(`Successfully connected to the database: ${this.settings.Database.host}`);
         } catch (error) {
             this.logger.error(`Error while connecting to the database: ${error.message}`);
         }

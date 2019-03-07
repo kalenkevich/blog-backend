@@ -1,5 +1,6 @@
 import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { Inject } from "typedi";
+import { ObjectID } from "typeorm";
 import { Post, PostInput } from "./model";
 import { User } from "../user/model";
 import PostService from "./service";
@@ -20,13 +21,9 @@ export default class PostResolver {
     private logger: Logger;
 
     @Query((returns) => [Post], { nullable: true })
-    public async getAllPosts(@Ctx("user") user: User) {
+    public async getAllPosts() {
         try {
-            const result = await this.postService.getAllPosts();
-
-            this.logger.trace(`Successfully fetched all posts for user: ${user.id} ${user.email}`);
-
-            return result;
+            return this.postService.getAllPosts();
         } catch (error) {
             this.logger.error(error);
 
@@ -35,13 +32,9 @@ export default class PostResolver {
     }
 
     @Query((returns) => Post)
-    public async getPost(@Ctx("user") user: User, @Arg("postId") postId: string) {
+    public async getPost(@Arg("postId") postId: number) {
         try {
-            const result = await this.postService.getPost(postId);
-
-            this.logger.trace(`Successfully fetched post for user: ${user.id} ${user.email}`);
-
-            return result;
+            return this.postService.getPost(postId);
         } catch (error) {
             this.logger.error(error);
 
@@ -52,7 +45,7 @@ export default class PostResolver {
     @Mutation((returns) => Post)
     public async createPost(@Ctx("user") user: User, @Arg("post") post: PostInput) {
         try {
-            const createdPost = await this.postService.createPost(post);
+            const createdPost = await this.postService.createPost(post, user);
 
             this.logger.trace(`Successfully created post: ${createdPost.id} by user: ${user.id} ${user.email}`);
 
@@ -80,7 +73,7 @@ export default class PostResolver {
     }
 
     @Mutation((returns) => OperationResult)
-    public async deletePost(@Ctx("user") user: User, @Arg("postId") postId: string) {
+    public async deletePost(@Ctx("user") user: User, @Arg("postId") postId: number) {
         try {
             await this.postService.deletePost(postId);
 
@@ -95,11 +88,11 @@ export default class PostResolver {
     }
 
     @Mutation((returns) => OperationResult)
-    public async addComment(@Ctx("user") user: User, @Arg("postId") postId: string, @Arg("comment") comment: CommentInput) {
+    public async addComment(@Ctx("user") user: User, @Arg("postId") postId: number, @Arg("comment") comment: CommentInput) {
         try {
             const createdComment = await this.postService.addComment(postId, comment);
 
-            this.logger.trace(`Successfully added comment: ${createdComment.id} for post: ${postId} by user: ${user.id} ${user.email}`);
+            this.logger.trace(`Successfully added comment: ${createdComment.id.toString()} for post: ${postId} by user: ${user.id} ${user.email}`);
 
             return OperationResult.createSuccessResult();
         } catch (error) {
@@ -125,7 +118,7 @@ export default class PostResolver {
     }
 
     @Mutation((returns) => OperationResult)
-    public async deleteComment(@Ctx("user") user: User, @Arg("commentId") commentId: string) {
+    public async deleteComment(@Ctx("user") user: User, @Arg("commentId") commentId: number) {
         try {
             await this.commentService.deleteComment(commentId);
 

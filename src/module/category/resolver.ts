@@ -1,6 +1,6 @@
 import { Arg, Mutation, Query, Resolver } from "type-graphql";
 import { Inject } from "typedi";
-import Logger from "../../../connector/logger";
+import Logger from "../../connector/logger";
 import { Category, CategoryInput } from "./model";
 import { CategoryService } from "./service";
 

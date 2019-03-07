@@ -1,5 +1,4 @@
 import { Field, InputType } from "type-graphql";
-import { UserRole } from "../user/role";
 
 @InputType()
 export class UserSignInInput {
@@ -19,11 +18,5 @@ export class UserSignUpInput {
     public email: string;
 
     @Field()
-    public phone: string;
-
-    @Field()
     public password: string;
-
-    @Field()
-    public role: UserRole;
 }

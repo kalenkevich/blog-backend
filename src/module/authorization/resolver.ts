@@ -2,9 +2,9 @@ import { ApolloError } from "apollo-error";
 import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { Inject } from "typedi";
 import { Request, Response } from "express";
-import Logger from "../../connector/logger";
 import { User } from "../user/model";
 import { UserSignInInput, UserSignUpInput } from "./model";
+import Logger from "../../connector/logger";
 import AuthorizationService from "./service";
 
 @Resolver(User)
@@ -66,8 +66,10 @@ export default class AuthorizationResolver {
     }
 
     @Query((returns) => Boolean)
-    public async signOut(@Ctx("token") token: string, @Ctx("response") res: Response) {
+    public async signOut(@Ctx("request") req: Request, @Ctx("response") res: Response) {
         try {
+            const { token } = req.cookies;
+
             await this.authorizationService.signOut(token);
 
             res.clearCookie("token");
