@@ -1,5 +1,5 @@
 import { Field, ID, InputType, ObjectType } from "type-graphql";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
 import { User } from "../user/model";
 import {Post} from "../post/model";
 
@@ -27,7 +27,7 @@ export class Comment {
     @Field()
     creationDate: Date;
 
-    @Column()
+    @Column({ default: 0.0 })
     @Field()
     rate: number;
 
@@ -36,6 +36,6 @@ export class Comment {
     author: User;
 
     @Field(type => Post)
-    @ManyToOne(type => Post, post => post.comments, { nullable: true })
+    @ManyToOne(type => Post, post => post.comments)
     post: Post;
 }

@@ -18,7 +18,7 @@ export default class PostService {
 
     public getPost(postId: number): Promise<Post> {
         return this.repository.findOne(postId, {
-            relations: ['author', 'comments'],
+            relations: ['author', 'comments', 'comments.author'],
         });
     }
 
@@ -27,6 +27,7 @@ export default class PostService {
             relations: ['author', 'comments'],
         });
 
+        //TODO Use aggregation query instead
         return this.getPostsPreview(posts);
     }
 
@@ -38,6 +39,7 @@ export default class PostService {
             },
         });
 
+        //TODO Use aggregation query instead
         return this.getPostsPreview(posts);
     }
 
@@ -59,16 +61,16 @@ export default class PostService {
         return this.repository.delete(postId);
     }
 
-    public async addComment(postId: number, comment: CommentInput) {
+    public async addComment(postId: number, user: User, comment: CommentInput) {
         const post = await this.getPost(postId);
 
-        return this.commentService.createComment(comment, post);
+        return this.commentService.createComment(post, user, comment);
     }
 
     private getPostsPreview(posts: Post[]):PostPreview[] {
         return posts.map(({ id, content, comments, author, categories, creationDate, rate, title }) => {
             const commentsCount = (comments || []).length;
-            const contentPreview = content.slice(0, 100);
+            const contentPreview = `${content.slice(0, 500)}...`;
 
             return {
                 id,

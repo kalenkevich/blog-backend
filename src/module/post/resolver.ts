@@ -89,7 +89,7 @@ export default class PostResolver {
     @Mutation((returns) => OperationResult)
     public async addComment(@Ctx("user") user: User, @Arg("postId") postId: number, @Arg("comment") comment: CommentInput) {
         try {
-            const createdComment = await this.postService.addComment(postId, comment);
+            const createdComment = await this.postService.addComment(postId, user, comment);
 
             this.logger.trace(`Successfully added comment: ${createdComment.id.toString()} for post: ${postId} by user: ${user.id} ${user.email}`);
 

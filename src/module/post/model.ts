@@ -1,5 +1,5 @@
 import { Field, ID, InputType, ObjectType } from "type-graphql";
-import { Column, Entity, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "../user/model";
 import { Category, CategoryInput } from "../category/model";
 import { Comment } from "../comment/model";
@@ -46,7 +46,7 @@ export class Post {
     @Field(type => [Category], { nullable: true })
     categories: Category[];
 
-    @ManyToOne(type => Comment, comment => comment.post, { nullable: true })
+    @OneToMany(type => Comment, comment => comment.post, { nullable: true })
     @Field((type) => [Comment], { nullable: true })
     comments?: Comment[];
 
