@@ -1,18 +1,21 @@
-import { Service } from "typedi";
+import { Service} from "typedi";
 import { DeleteResult, getRepository, Repository, UpdateResult} from "typeorm";
 import { Comment, CommentInput } from "./model";
-import { Post } from "../post/model";
 import { User } from "../user/model";
 
 @Service()
 export default class CommentService {
     private repository: Repository<Comment> = getRepository(Comment);
 
-    public createComment(post: Post, author: User, comment: CommentInput): Promise<Comment> {
+    public getCommentPost(commentId: number) {
+        return this.repository.findOne(commentId);
+    }
+
+    public createComment(postId: number, author: User, comment: CommentInput): Promise<Comment> {
         const createdComment = this.repository.create({
             ...comment,
             creationDate: new Date(),
-            post,
+            postId,
             author,
         });
 

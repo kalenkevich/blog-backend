@@ -1,5 +1,5 @@
 import { Field, ID, InputType, ObjectType } from "type-graphql";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
+import {Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
 import { User } from "../user/model";
 import {Post} from "../post/model";
 
@@ -35,7 +35,11 @@ export class Comment {
     @ManyToOne((type) => User)
     author: User;
 
+    @Column({ type: "int", nullable: true })
+    postId: number;
+
     @Field(type => Post)
     @ManyToOne(type => Post, post => post.comments)
+    @JoinColumn({ name: "postId" })
     post: Post;
 }

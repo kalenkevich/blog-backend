@@ -6,15 +6,11 @@ import PostService from "./service";
 import Logger from "../../connector/logger";
 import {CommentInput} from "../comment/model";
 import OperationResult from "../operation/operation-result";
-import CommentService from "../comment/service";
 
 @Resolver(Post)
 export default class PostResolver {
     @Inject()
     private postService: PostService;
-
-    @Inject()
-    private commentService: CommentService;
 
     @Inject()
     private logger: Logger;
@@ -86,14 +82,10 @@ export default class PostResolver {
         }
     }
 
-    @Mutation((returns) => OperationResult)
+    @Mutation((returns) => Post)
     public async addComment(@Ctx("user") user: User, @Arg("postId") postId: number, @Arg("comment") comment: CommentInput) {
         try {
-            const createdComment = await this.postService.addComment(postId, user, comment);
-
-            this.logger.trace(`Successfully added comment: ${createdComment.id.toString()} for post: ${postId} by user: ${user.id} ${user.email}`);
-
-            return OperationResult.createSuccessResult();
+            return this.postService.addComment(postId, user, comment);
         } catch (error) {
             this.logger.error(error);
 
@@ -101,14 +93,10 @@ export default class PostResolver {
         }
     }
 
-    @Mutation((returns) => OperationResult)
+    @Mutation((returns) => Post)
     public async updateComment(@Ctx("user") user: User, @Arg("comment") comment: CommentInput) {
         try {
-            await this.commentService.updateComment(comment);
-
-            this.logger.trace(`Successfully updates comment: ${comment.id} by user: ${user.id} ${user.email}`);
-
-            return OperationResult.createSuccessResult();
+            return this.postService.updateComment(comment);
         } catch (error) {
             this.logger.error(error);
 
@@ -116,14 +104,10 @@ export default class PostResolver {
         }
     }
 
-    @Mutation((returns) => OperationResult)
+    @Mutation((returns) => Post)
     public async deleteComment(@Ctx("user") user: User, @Arg("commentId") commentId: number) {
         try {
-            await this.commentService.deleteComment(commentId);
-
-            this.logger.trace(`Successfully deleted comment: ${commentId} by user: ${user.id} ${user.email}`);
-
-            return OperationResult.createSuccessResult();
+            return this.postService.deleteComment(commentId);
         } catch (error) {
             this.logger.error(error);
 

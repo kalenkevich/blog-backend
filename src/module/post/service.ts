@@ -35,7 +35,7 @@ export default class PostService {
         const posts = await this.repository.find({
             relations: ['author', 'comments'],
             where: {
-                "authorId": { value: authorId },
+                author: { id: authorId },
             },
         });
 
@@ -61,10 +61,33 @@ export default class PostService {
         return this.repository.delete(postId);
     }
 
-    public async addComment(postId: number, user: User, comment: CommentInput) {
-        const post = await this.getPost(postId);
+    public async addComment(postId: number, user: User, comment: CommentInput): Promise<Post> {
+        const createdComment = await this.commentService.createComment(postId, user, comment);
 
-        return this.commentService.createComment(post, user, comment);
+        return this.getPostByComment(createdComment.id);
+    }
+
+    public async updateComment(comment: CommentInput): Promise<Post> {
+        await this.commentService.updateComment(comment);
+
+        return this.getPostByComment(comment.id);
+    }
+
+    public async deleteComment(commentId: number): Promise<Post> {
+        const post = await this.getPostByComment(commentId);
+
+        await this.commentService.deleteComment(commentId);
+
+        return this.getPost(post.id);
+    }
+
+    private getPostByComment(commentId: number): Promise<Post> {
+        return this.repository.findOne({
+            where: {
+                comments: { id: commentId },
+            },
+            relations: ['author', 'comments', 'comments.author'],
+        });
     }
 
     private getPostsPreview(posts: Post[]):PostPreview[] {
