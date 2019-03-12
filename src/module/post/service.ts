@@ -1,5 +1,5 @@
 import { Inject, Service } from "typedi";
-import { getRepository, Repository } from "typeorm";
+import { getRepository, Like, Repository } from "typeorm";
 import { Post, PostInput, PostPreview } from "./model";
 import { CommentInput } from "../comment/model";
 import { UserService } from "../user/service";
@@ -79,6 +79,15 @@ export default class PostService {
         await this.commentService.deleteComment(commentId);
 
         return this.getPost(post.id);
+    }
+
+    public async searchPosts(searchQuery: string): Promise<PostPreview[]> {
+        const posts = await this.repository.find({
+            where: { title: Like(`%${searchQuery}%`) },
+            relations: ['author', 'comments'],
+        });
+
+        return this.getPostsPreview(posts);
     }
 
     private getPostByComment(commentId: number): Promise<Post> {

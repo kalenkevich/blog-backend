@@ -1,5 +1,5 @@
 import { Field, ID, InputType, ObjectType } from "type-graphql";
-import { Column, Entity, OneToMany, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, ManyToMany, ManyToOne, PrimaryGeneratedColumn, Index } from "typeorm";
 import { User } from "../user/model";
 import { Category, CategoryInput } from "../category/model";
 import { Comment } from "../comment/model";
@@ -27,6 +27,7 @@ export class Post {
     id: number;
 
     @Column()
+    @Index()
     @Field()
     title: string;
 

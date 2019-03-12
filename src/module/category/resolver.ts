@@ -12,14 +12,10 @@ export default class CategoryResolver {
     @Inject()
     public logger: Logger;
 
-    @Query((returns) => Category)
-    public async getCategory(@Arg("value") value: string) {
+    @Query((returns) => [Category])
+    public async getCategories(@Arg("query") query: string) {
         try {
-            const result = await this.categoryService.getCategory(value);
-
-            this.logger.info(`Successfully fetched category with value: ${value}`);
-
-            return result;
+            return this.categoryService.getCategories(query);
         } catch (error) {
             this.logger.error(error);
 

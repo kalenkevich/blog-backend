@@ -125,4 +125,15 @@ export default class PostResolver {
             throw error;
         }
     }
+
+    @Query((returns) => [PostPreview])
+    public async searchPosts(@Arg("query") query: string,) {
+        try {
+            return this.postService.searchPosts(query);
+        } catch (error) {
+            this.logger.error(error);
+
+            throw error;
+        }
+    }
 }

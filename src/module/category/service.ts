@@ -6,8 +6,8 @@ import { Category, CategoryInput } from "./model";
 export class CategoryService {
     private repository: Repository<Category> = getRepository(Category);
 
-    public getCategory(value: string): Promise<Category> {
-        return this.repository.findOne(value);
+    public getCategories(value: string): Promise<Category[]> {
+        return this.repository.find({ value });
     }
 
     public getAllCategories(): Promise<Category[]> {
