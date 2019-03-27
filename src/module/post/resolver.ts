@@ -4,8 +4,8 @@ import { Post, PostInput, PostPreview } from "./model";
 import { User } from "../user/model";
 import PostService from "./service";
 import Logger from "../../connector/logger";
-import {CommentInput} from "../comment/model";
 import OperationResult from "../operation/operation-result";
+import {CommentInput} from "../comment/model";
 
 @Resolver(Post)
 export default class PostResolver {
@@ -86,28 +86,6 @@ export default class PostResolver {
     public async addComment(@Ctx("user") user: User, @Arg("postId") postId: number, @Arg("comment") comment: CommentInput) {
         try {
             return this.postService.addComment(postId, user, comment);
-        } catch (error) {
-            this.logger.error(error);
-
-            throw error;
-        }
-    }
-
-    @Mutation((returns) => Post)
-    public async updateComment(@Ctx("user") user: User, @Arg("comment") comment: CommentInput) {
-        try {
-            return this.postService.updateComment(comment);
-        } catch (error) {
-            this.logger.error(error);
-
-            throw error;
-        }
-    }
-
-    @Mutation((returns) => Post)
-    public async deleteComment(@Ctx("user") user: User, @Arg("commentId") commentId: number) {
-        try {
-            return this.postService.deleteComment(commentId);
         } catch (error) {
             this.logger.error(error);
 

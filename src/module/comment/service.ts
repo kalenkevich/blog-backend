@@ -7,7 +7,7 @@ import { User } from "../user/model";
 export default class CommentService {
     private repository: Repository<Comment> = getRepository(Comment);
 
-    public getCommentPost(commentId: number) {
+    public getComment(commentId: number) {
         return this.repository.findOne(commentId);
     }
 
@@ -28,5 +28,22 @@ export default class CommentService {
 
     public deleteComment(commentId: number): Promise<DeleteResult> {
         return this.repository.delete(commentId);
+    }
+
+    public async rateComment(user: User, commentId: number, rateAction: string) {
+        const comment = await this.getComment(commentId);
+
+        //TODO Use aggregation query instead
+        if (rateAction === 'UP') {
+            await this.repository.save({
+                ...comment,
+                rate: comment.rate + 1,
+            });
+        } else if (rateAction === 'DOWN') {
+            await this.repository.save({
+                ...comment,
+                rate: comment.rate - 1,
+            });
+        }
     }
 }

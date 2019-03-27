@@ -62,23 +62,9 @@ export default class PostService {
     }
 
     public async addComment(postId: number, user: User, comment: CommentInput): Promise<Post> {
-        const createdComment = await this.commentService.createComment(postId, user, comment);
+        await this.commentService.createComment(postId, user, comment);
 
-        return this.getPostByComment(createdComment.id);
-    }
-
-    public async updateComment(comment: CommentInput): Promise<Post> {
-        await this.commentService.updateComment(comment);
-
-        return this.getPostByComment(comment.id);
-    }
-
-    public async deleteComment(commentId: number): Promise<Post> {
-        const post = await this.getPostByComment(commentId);
-
-        await this.commentService.deleteComment(commentId);
-
-        return this.getPost(post.id);
+        return this.getPost(postId);
     }
 
     public async searchPosts(searchQuery: string): Promise<PostPreview[]> {
