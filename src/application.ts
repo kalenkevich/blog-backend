@@ -34,7 +34,7 @@ export default class ApplicationServer {
 
     public constructor(@Inject("settings") settings: any) {
         this.settings = settings;
-        this.port = settings.Port;
+        this.port = process.env.PORT || settings.Port;
         this.app = express();
 
         this.registerBodyParsers(settings);
