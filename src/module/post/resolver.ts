@@ -27,7 +27,7 @@ export default class PostResolver {
     }
 
     @Query((returns) => Post)
-    public async getPost(@Arg("postId") postId: number) {
+    public async getPost(@Ctx("user") user: User, @Arg("postId") postId: number) {
         try {
             return this.postService.getPost(postId);
         } catch (error) {
@@ -115,10 +115,12 @@ export default class PostResolver {
         }
     }
 
-    @Mutation((returns) => Post)
+    @Mutation((returns) => OperationResult)
     public async ratePost(@Ctx("user") user: User, @Arg("postId") postId: number, @Arg("rateAction") rateAction: string) {
         try {
-            return this.postService.ratePost(user, postId, rateAction);
+            await this.postService.ratePost(user, postId, rateAction);
+
+            return OperationResult.createSuccessResult();
         } catch (error) {
             this.logger.error(error);
 

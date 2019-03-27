@@ -90,7 +90,7 @@ export default class PostService {
         return this.getPostsPreview(posts);
     }
 
-    public async ratePost(user: User, postId: number, rateAction: string): Promise<Post> {
+    public async ratePost(user: User, postId: number, rateAction: string) {
         const post = await this.getPost(postId);
 
         //TODO Use aggregation query instead
@@ -105,8 +105,6 @@ export default class PostService {
                 rate: post.rate - 1,
             });
         }
-
-        return this.getPost(postId);
     }
 
     private getPostByComment(commentId: number): Promise<Post> {
