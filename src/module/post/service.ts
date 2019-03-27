@@ -90,6 +90,25 @@ export default class PostService {
         return this.getPostsPreview(posts);
     }
 
+    public async ratePost(user: User, postId: number, rateAction: string): Promise<Post> {
+        const post = await this.getPost(postId);
+
+        //TODO Use aggregation query instead
+        if (rateAction === 'UP') {
+            await this.repository.save({
+                ...post,
+                rate: post.rate + 1,
+            });
+        } else if (rateAction === 'DOWN') {
+            await this.repository.save({
+                ...post,
+                rate: post.rate - 1,
+            });
+        }
+
+        return this.getPost(postId);
+    }
+
     private getPostByComment(commentId: number): Promise<Post> {
         return this.repository.findOne({
             where: {

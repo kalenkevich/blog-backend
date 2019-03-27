@@ -115,6 +115,17 @@ export default class PostResolver {
         }
     }
 
+    @Mutation((returns) => Post)
+    public async ratePost(@Ctx("user") user: User, @Arg("postId") postId: number, @Arg("rateAction") rateAction: string) {
+        try {
+            return this.postService.ratePost(user, postId, rateAction);
+        } catch (error) {
+            this.logger.error(error);
+
+            throw error;
+        }
+    }
+
     @Query((returns) => [PostPreview])
     public async getUserPosts(@Arg("userId") userId: number,) {
         try {
