@@ -28,6 +28,7 @@ export default class PostService {
 
     public async getAllPosts(): Promise<PostPreview[]> {
         const posts = await this.repository.find({
+            order: { creationDate: 'DESC' },
             relations: ['author', 'comments'],
         });
 
