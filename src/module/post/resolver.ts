@@ -55,11 +55,11 @@ export default class PostResolver {
     @Mutation((returns) => Post)
     public async updatePost(@Ctx("user") user: User, @Arg("post") post: PostInput) {
         try {
-            await this.postService.updatePost(post);
+            const result = await this.postService.updatePost(post);
 
             this.logger.trace(`Successfully updated post: ${post.id} by user: ${user.id} ${user.email}`);
 
-            return OperationResult.createSuccessResult();
+            return result;
         } catch (error) {
             this.logger.error(error);
 

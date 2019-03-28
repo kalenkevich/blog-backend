@@ -3,13 +3,11 @@ import { Column, Entity, Index, PrimaryGeneratedColumn } from "typeorm";
 
 @InputType()
 export class CategoryInput implements Partial<Category> {
-    @Column()
+    @Field((type) => ID)
+    public id: number;
+
     @Field()
     public value: string;
-
-    @Column()
-    @Field({ nullable: true })
-    public nameKey: string;
 }
 
 @Entity("categories")

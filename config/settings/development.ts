@@ -1,5 +1,8 @@
 export default {
-    AllowedClientOrigins: ['https://kalenkevich-blog-development.herokuapp.com'],
+    AllowedClientOrigins: [
+        'https://kalenkevich-blog-development.herokuapp.com',
+        'http://kalenkevich-blog-development.herokuapp.com',
+    ],
     Database: {
         host: "ec2-54-75-232-114.eu-west-1.compute.amazonaws.com",
         port: 5432,

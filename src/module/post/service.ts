@@ -4,6 +4,7 @@ import { Post, PostInput, PostPreview } from "./model";
 import { CommentInput } from "../comment/model";
 import { UserService } from "../user/service";
 import { User } from "../user/model";
+import { CategoryService } from "../category/service";
 import CommentService from "../comment/service";
 
 @Service()
@@ -13,6 +14,9 @@ export default class PostService {
 
     @Inject()
     private userService: UserService;
+
+    @Inject()
+    private categoryService: CategoryService;
 
     private repository: Repository<Post> = getRepository(Post);
 
@@ -54,7 +58,14 @@ export default class PostService {
     }
 
     public async updatePost(post: PostInput): Promise<any> {
-        return this.repository.update(post.id, post);
+        const currentPost = await this.getPost(post.id);
+
+        return this.repository.save({
+            ...currentPost,
+            title: post.title,
+            content: post.content,
+            categories: post.categories,
+        });
     }
 
     public deletePost(postId: number): Promise<any> {

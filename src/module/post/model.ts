@@ -1,5 +1,5 @@
 import { Field, ID, InputType, ObjectType } from "type-graphql";
-import { Column, Entity, OneToMany, ManyToMany, ManyToOne, PrimaryGeneratedColumn, Index } from "typeorm";
+import {Column, Entity, OneToMany, ManyToMany, ManyToOne, PrimaryGeneratedColumn, Index, JoinTable} from "typeorm";
 import { User } from "../user/model";
 import { Category, CategoryInput } from "../category/model";
 import { Comment } from "../comment/model";
@@ -15,7 +15,7 @@ export class PostInput {
     @Field()
     public content: string;
 
-    @Field(type => [CategoryInput])
+    @Field(type => [CategoryInput], { nullable: true })
     public categories: Category[];
 }
 
@@ -43,11 +43,12 @@ export class Post {
     @Field()
     rate: number;
 
-    @ManyToMany(type => Category)
     @Field(type => [Category], { nullable: true })
+    @ManyToMany(type => Category)
+    @JoinTable()
     categories: Category[];
 
-    @OneToMany(type => Comment, comment => comment.post, { nullable: true })
+    @OneToMany(type => Comment, comment => comment.post, { nullable: true, onDelete: 'CASCADE' })
     @Field((type) => [Comment], { nullable: true })
     comments?: Comment[];
 
