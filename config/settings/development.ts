@@ -2,6 +2,8 @@ export default {
     AllowedClientOrigins: [
         'https://kalenkevich-blog-development.herokuapp.com',
         'http://kalenkevich-blog-development.herokuapp.com',
+        'https://development.blog.kalenkevich.com',
+        'http://development.blog.kalenkevich.com',
     ],
     Database: {
         host: "ec2-54-75-232-114.eu-west-1.compute.amazonaws.com",

@@ -1,8 +1,9 @@
 import { Field, ID, InputType, ObjectType } from "type-graphql";
-import {Column, Entity, OneToMany, ManyToMany, ManyToOne, PrimaryGeneratedColumn, Index, JoinTable} from "typeorm";
+import { Column, Entity, OneToMany, ManyToMany, ManyToOne, PrimaryGeneratedColumn, Index, JoinTable } from "typeorm";
 import { User } from "../user/model";
 import { Category, CategoryInput } from "../category/model";
 import { Comment } from "../comment/model";
+import { PostRateUserAction } from "../rate/model";
 
 @InputType()
 export class PostInput {
@@ -36,12 +37,16 @@ export class Post {
     content: string;
 
     @Field(type => User)
-    @ManyToOne(type => User, { cascade: true })
+    @ManyToOne(type => User)
     author: User;
 
     @Column({ default: 0.0 })
     @Field()
     rate: number;
+
+    @Field(type => [PostRateUserAction], { nullable: true })
+    @OneToMany(type => PostRateUserAction, userAction => userAction.post, { nullable: true, onDelete: 'CASCADE' })
+    ratedUsers: PostRateUserAction[];
 
     @Field(type => [Category], { nullable: true })
     @ManyToMany(type => Category)
@@ -73,6 +78,9 @@ export class PostPreview {
 
     @Field()
     rate: number;
+
+    @Field(type => [PostRateUserAction], { nullable: true })
+    ratedUsers: PostRateUserAction[];
 
     @Field(type => [Category], { nullable: true })
     categories: Category[];

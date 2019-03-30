@@ -40,12 +40,10 @@ export default class CommentResolver {
         }
     }
 
-    @Mutation((returns) => OperationResult)
-    public async rateComment(@Ctx("user") user: User, @Arg("commentId") commentId: number, @Arg("rateAction") rateAction: string) {
+    @Mutation((returns) => Comment)
+    public async rateComment(@Ctx("user") user: User, @Arg("commentId") commentId: number, @Arg("rateAction") rateAction: boolean) {
         try {
-            await this.commentService.rateComment(user, commentId, rateAction);
-
-            return OperationResult.createSuccessResult();
+            return this.commentService.rateComment(user, commentId, rateAction);
         } catch (error) {
             this.logger.error(error);
 

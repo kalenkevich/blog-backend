@@ -1,7 +1,8 @@
 import { Field, ID, InputType, ObjectType } from "type-graphql";
-import {Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "../user/model";
-import {Post} from "../post/model";
+import { Post } from "../post/model";
+import { CommentRateUserAction } from "../rate/model";
 
 @InputType()
 export class CommentInput {
@@ -30,6 +31,10 @@ export class Comment {
     @Column({ default: 0.0 })
     @Field()
     rate: number;
+
+    @Field(type => [CommentRateUserAction], { nullable: true })
+    @OneToMany(type => CommentRateUserAction, userAction => userAction.comment, { nullable: true, onDelete: 'CASCADE' })
+    ratedUsers: CommentRateUserAction[];
 
     @Field((type) => User)
     @ManyToOne((type) => User)

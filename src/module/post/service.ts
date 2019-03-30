@@ -6,6 +6,7 @@ import { UserService } from "../user/service";
 import { User } from "../user/model";
 import { CategoryService } from "../category/service";
 import CommentService from "../comment/service";
+import RateActionService from "../rate/service";
 
 @Service()
 export default class PostService {
@@ -18,18 +19,29 @@ export default class PostService {
     @Inject()
     private categoryService: CategoryService;
 
+    @Inject()
+    private rateActionService: RateActionService;
+
     private repository: Repository<Post> = getRepository(Post);
 
     public getPost(postId: number): Promise<Post> {
         return this.repository.findOne(postId, {
-            relations: ['author', 'comments', 'comments.author'],
+            relations: [
+                'author',
+                'comments',
+                'comments.author',
+                'ratedUsers',
+                'ratedUsers.user',
+                'comments.ratedUsers',
+                'comments.ratedUsers.user',
+            ],
         });
     }
 
     public async getAllPosts(): Promise<PostPreview[]> {
         const posts = await this.repository.find({
             order: { creationDate: 'DESC' },
-            relations: ['author', 'comments'],
+            relations: ['author', 'comments', 'ratedUsers', 'ratedUsers.user'],
         });
 
         //TODO Use aggregation query instead
@@ -38,7 +50,8 @@ export default class PostService {
 
     public async getUserPosts(authorId: number): Promise<PostPreview[]> {
         const posts = await this.repository.find({
-            relations: ['author', 'comments'],
+            relations: ['author', 'comments', 'ratedUsers', 'ratedUsers.user'],
+            order: { creationDate: 'DESC' },
             where: {
                 author: { id: authorId },
             },
@@ -88,34 +101,39 @@ export default class PostService {
         return this.getPostsPreview(posts);
     }
 
-    public async ratePost(user: User, postId: number, rateAction: string) {
+    public async ratePost(user: User, postId: number, rateAction: boolean) {
         const post = await this.getPost(postId);
+        const existingRateAction = (post.ratedUsers || []).find(rateUser => rateUser.user.id === user.id);
 
-        //TODO Use aggregation query instead
-        if (rateAction === 'UP') {
-            await this.repository.save({
-                ...post,
-                rate: post.rate + 1,
-            });
-        } else if (rateAction === 'DOWN') {
-            await this.repository.save({
-                ...post,
-                rate: post.rate - 1,
-            });
+        if (existingRateAction) {
+            await this.rateActionService.switchPostAction(existingRateAction);
+
+            if (rateAction) {
+                await this.repository.update(post.id, { rate: post.rate + 2 });
+            } else {
+                await this.repository.update(post.id, { rate: post.rate - 2 });
+            }
+        } else {
+            const postRateAction = await this.rateActionService.createPostRateAction(user, post, rateAction);
+
+            if (rateAction) {
+                post.rate++;
+                post.ratedUsers.push(postRateAction);
+
+                await this.repository.save(post);
+            } else {
+                post.rate--;
+                post.ratedUsers.push(postRateAction);
+
+                await this.repository.save(post);
+            }
         }
-    }
 
-    private getPostByComment(commentId: number): Promise<Post> {
-        return this.repository.findOne({
-            where: {
-                comments: { id: commentId },
-            },
-            relations: ['author', 'comments', 'comments.author'],
-        });
+        return this.getPost(postId);
     }
 
     private getPostsPreview(posts: Post[]):PostPreview[] {
-        return posts.map(({ id, content, comments, author, categories, creationDate, rate, title }) => {
+        return posts.map(({ id, content, comments, author, categories, creationDate, rate, title, ratedUsers }) => {
             const commentsCount = (comments || []).length;
             const contentPreview = `${content.slice(0, 500)}...`;
 
@@ -127,6 +145,7 @@ export default class PostService {
                 categories,
                 creationDate,
                 rate,
+                ratedUsers,
                 title,
             };
         });

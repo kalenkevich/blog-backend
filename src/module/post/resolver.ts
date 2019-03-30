@@ -93,12 +93,10 @@ export default class PostResolver {
         }
     }
 
-    @Mutation((returns) => OperationResult)
-    public async ratePost(@Ctx("user") user: User, @Arg("postId") postId: number, @Arg("rateAction") rateAction: string) {
+    @Mutation((returns) => Post)
+    public async ratePost(@Ctx("user") user: User, @Arg("postId") postId: number, @Arg("rateAction") rateAction: boolean) {
         try {
-            await this.postService.ratePost(user, postId, rateAction);
-
-            return OperationResult.createSuccessResult();
+            return this.postService.ratePost(user, postId, rateAction);
         } catch (error) {
             this.logger.error(error);
 
