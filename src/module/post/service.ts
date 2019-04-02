@@ -28,6 +28,7 @@ export default class PostService {
         return this.repository.findOne(postId, {
             relations: [
                 'author',
+                'categories',
                 'comments',
                 'comments.author',
                 'ratedUsers',
@@ -41,7 +42,7 @@ export default class PostService {
     public async getAllPosts(): Promise<PostPreview[]> {
         const posts = await this.repository.find({
             order: { creationDate: 'DESC' },
-            relations: ['author', 'comments', 'ratedUsers', 'ratedUsers.user'],
+            relations: ['author', 'categories', 'comments', 'ratedUsers', 'ratedUsers.user'],
         });
 
         //TODO Use aggregation query instead
@@ -50,7 +51,7 @@ export default class PostService {
 
     public async getUserPosts(authorId: number): Promise<PostPreview[]> {
         const posts = await this.repository.find({
-            relations: ['author', 'comments', 'ratedUsers', 'ratedUsers.user'],
+            relations: ['author', 'categories', 'comments', 'ratedUsers', 'ratedUsers.user'],
             order: { creationDate: 'DESC' },
             where: {
                 author: { id: authorId },

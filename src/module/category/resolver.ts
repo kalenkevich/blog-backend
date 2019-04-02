@@ -13,9 +13,9 @@ export default class CategoryResolver {
     public logger: Logger;
 
     @Query((returns) => [Category])
-    public async getCategories(@Arg("query") query: string) {
+    public async searchCategory(@Arg("query") query: string) {
         try {
-            return this.categoryService.getCategories(query);
+            return this.categoryService.searchCategories(query);
         } catch (error) {
             this.logger.error(error);
 
@@ -38,7 +38,7 @@ export default class CategoryResolver {
         }
     }
 
-    @Mutation((returns) => [Category])
+    @Mutation((returns) => Category)
     public async addCategory(@Arg("category") category: CategoryInput) {
         try {
             const result = await this.categoryService.addCategory(category);

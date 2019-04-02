@@ -1,4 +1,4 @@
-import { Arg, Ctx, Mutation, Resolver } from "type-graphql";
+import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { Inject } from "typedi";
 import { User } from "../user/model";
 import { Comment, CommentInput } from "./model";

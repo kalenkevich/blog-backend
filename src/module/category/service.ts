@@ -1,13 +1,15 @@
 import { Service } from "typedi";
-import { getRepository, Repository} from "typeorm";
+import { getRepository, Like, Repository } from "typeorm";
 import { Category, CategoryInput } from "./model";
 
 @Service()
 export class CategoryService {
     private repository: Repository<Category> = getRepository(Category);
 
-    public getCategories(value: string): Promise<Category[]> {
-        return this.repository.find({ value });
+    public searchCategories(query: string): Promise<Category[]> {
+        return this.repository.find({
+            where: { title: Like(`%${query}%`) },
+        });
     }
 
     public getAllCategories(): Promise<Category[]> {

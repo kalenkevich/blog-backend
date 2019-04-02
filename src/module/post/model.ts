@@ -49,7 +49,7 @@ export class Post {
     ratedUsers: PostRateUserAction[];
 
     @Field(type => [Category], { nullable: true })
-    @ManyToMany(type => Category)
+    @ManyToMany(type => Category, { nullable: true })
     @JoinTable()
     categories: Category[];
 

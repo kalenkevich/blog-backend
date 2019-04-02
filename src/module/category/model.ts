@@ -3,7 +3,7 @@ import { Column, Entity, Index, PrimaryGeneratedColumn } from "typeorm";
 
 @InputType()
 export class CategoryInput implements Partial<Category> {
-    @Field((type) => ID)
+    @Field((type) => ID, { nullable: true })
     public id: number;
 
     @Field()
