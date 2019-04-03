@@ -73,14 +73,26 @@ export default class PostService {
     }
 
     public async updatePost(post: PostInput): Promise<any> {
-        const currentPost = await this.getPost(post.id);
+        const currentPost = await this.repository.findOne(post.id, { relations: ['categories'] });
+        const currentPostCategories = (currentPost.categories || []).map(({ id }) => ({ id }));
+        const newPostCategories = (post.categories || []).map(({ id }) => ({ id }));
 
-        return this.repository.save({
-            ...currentPost,
+        await this.repository.createQueryBuilder()
+            .relation(Post, "categories")
+            .of({ id: post.id })
+            .remove(currentPostCategories);
+
+        await this.repository.createQueryBuilder()
+            .relation(Post, "categories")
+            .of({ id: post.id })
+            .add(newPostCategories);
+
+        await this.repository.update(post.id, {
             title: post.title,
             content: post.content,
-            categories: post.categories,
         });
+
+        return this.getPost(post.id);
     }
 
     public deletePost(postId: number): Promise<any> {
@@ -136,7 +148,7 @@ export default class PostService {
     private getPostsPreview(posts: Post[]):PostPreview[] {
         return posts.map(({ id, content, comments, author, categories, creationDate, rate, title, ratedUsers }) => {
             const commentsCount = (comments || []).length;
-            const contentPreview = `${content.slice(0, 500)}...`;
+            const contentPreview = content.slice(0, 500);
 
             return {
                 id,

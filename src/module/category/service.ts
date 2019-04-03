@@ -8,7 +8,7 @@ export class CategoryService {
 
     public searchCategories(query: string): Promise<Category[]> {
         return this.repository.find({
-            where: { title: Like(`%${query}%`) },
+            where: { value: Like(`%${query}%`) },
         });
     }
 
