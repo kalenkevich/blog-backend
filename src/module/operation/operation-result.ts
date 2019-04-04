@@ -1,26 +1,26 @@
-import { Field, ObjectType, registerEnumType } from "type-graphql";
+import {Field, ObjectType, registerEnumType} from "type-graphql";
 
 export enum OperationResultCode {
-    success = "success",
-    error = "error",
+  success = "success",
+  error = "error",
 }
 
-registerEnumType(OperationResultCode, { name: "OperationResultCode" });
+registerEnumType(OperationResultCode, {name: "OperationResultCode"});
 
 @ObjectType()
 export default class OperationResult {
-    @Field(type => OperationResultCode)
-    code: OperationResultCode;
+  @Field(type => OperationResultCode)
+  code: OperationResultCode;
 
-    @Field()
-    message: string;
+  @Field()
+  message: string;
 
-    static createSuccessResult(message: string = 'OK') {
-        const operationResult = new OperationResult();
+  static createSuccessResult(message: string = 'OK') {
+    const operationResult = new OperationResult();
 
-        operationResult.code = OperationResultCode.success;
-        operationResult.message = message;
+    operationResult.code = OperationResultCode.success;
+    operationResult.message = message;
 
-        return operationResult;
-    }
+    return operationResult;
+  }
 }

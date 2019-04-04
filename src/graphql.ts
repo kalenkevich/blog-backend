@@ -5,9 +5,9 @@ import CategoryResolver from './module/category/resolver';
 import AuthorizationResolver from './module/authorization/resolver';
 
 export const resolvers = [
-    UserResolver,
-    PostResolver,
-    CommentResolver,
-    CategoryResolver,
-    AuthorizationResolver,
+  UserResolver,
+  PostResolver,
+  CommentResolver,
+  CategoryResolver,
+  AuthorizationResolver,
 ];
