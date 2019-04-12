@@ -1,6 +1,7 @@
 export default {
-  Port: 9000,
+  Port: 9001,
   TokenSecret: "default-token-secret",
+  AuthUrl: "",
   Database: {
     Url: "",
   },

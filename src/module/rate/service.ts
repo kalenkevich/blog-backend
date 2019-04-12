@@ -13,7 +13,7 @@ export default class RateActionService {
 
   createPostRateAction(user: User, post: Post, action: boolean): Promise<PostRateUserAction> {
     const rateAction = this.postRateActionRepository.create({
-      user,
+      userId: user.id,
       post,
       action,
     });
@@ -23,7 +23,7 @@ export default class RateActionService {
 
   createCommentRateAction(user: User, comment: Comment, action: boolean): Promise<CommentRateUserAction> {
     const rateAction = this.commentRateActionRepository.create({
-      user,
+      userId: user.id,
       comment,
       action,
     });

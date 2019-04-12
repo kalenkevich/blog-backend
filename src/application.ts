@@ -7,9 +7,9 @@ import {buildSchema} from "type-graphql";
 import {ApolloServer} from "apollo-server-express";
 import {PostgressConnector} from "./connector/database";
 import {resolvers} from "./graphql";
-import {User} from "./module/user/model";
-import {UserRole} from "./module/user/role";
+import {UserRoles} from "./module/user/model";
 import Logger from "./connector/logger";
+import AuthConnector from "./connector/auth";
 
 @Service()
 export default class ApplicationServer {
@@ -21,15 +21,14 @@ export default class ApplicationServer {
   @Inject()
   private dbConnector: PostgressConnector;
 
+  @Inject()
+  private authConnector: AuthConnector;
+
   private server: ApolloServer;
 
   private readonly app: Application;
 
   private readonly port: number;
-
-  private get userRepository() {
-    return this.dbConnector.connection.getRepository(User);
-  }
 
   public constructor(@Inject("settings") settings: any) {
     this.settings = settings;
@@ -60,7 +59,7 @@ export default class ApplicationServer {
 
     const schema = await buildSchema({
       resolvers,
-      authChecker: ({root, args, context, info}, roles: UserRole[]) => {
+      authChecker: ({root, args, context, info}, roles: UserRoles[]) => {
         const {user} = context;
 
         return roles.indexOf(user.role) !== -1;
@@ -71,7 +70,7 @@ export default class ApplicationServer {
       schema,
       context: async ({req, res}) => {
         const {token} = req.cookies;
-        const user = await this.userRepository.findOne({token}) || {};
+        const user = await this.authConnector.getUser(token);
 
         return {user, token, request: req, response: res};
       },
@@ -91,18 +90,29 @@ export default class ApplicationServer {
     Container.set("EntityManager", this.dbConnector.entityManager);
   }
 
+  private async initAuth() {
+    await this.authConnector.connect();
+  }
+
   private async init() {
     try {
       await this.initDatabase();
-      this.logger.info(`Successfully connected to the database: ${this.settings.Database.host}.${this.settings.Database.database}`);
+      this.logger.info(`Database: Successfully connected to: ${this.settings.Database.host}.${this.settings.Database.database}`);
     } catch (error) {
-      this.logger.error(`Error while connecting to the database: ${error.message}`);
+      this.logger.error(`Database: Error while connecting: ${error.message}`);
+    }
+
+    try {
+      await this.initAuth();
+      this.logger.info(`Auth: Successfully connected to: ${this.settings.AuthUrl}`);
+    } catch (error) {
+      this.logger.error(`Auth: Error while connecting: ${error.message}`);
     }
 
     try {
       await this.initServer();
     } catch (error) {
-      this.logger.error(`Error while init server: ${error.message}`);
+      this.logger.error(`Server: Error while init: ${error.message}`);
     }
 
     return this;
@@ -110,13 +120,13 @@ export default class ApplicationServer {
 
   public async run() {
     try {
-      this.logger.info(`Running server...`);
+      this.logger.info(`Server: Init...`);
 
       await this.init();
 
-      this.app.listen(this.port, () => this.logger.info(`Server running on port: ${this.port}`));
+      this.app.listen(this.port, () => this.logger.info(`Server: Running on port: ${this.port}`));
     } catch (error) {
-      this.logger.error(`Error while starting server: ${error.message}`);
+      this.logger.error(`Server: Error while starting: ${error.message}`);
     }
   }
 }

@@ -3,6 +3,7 @@ import {DeleteResult, getRepository, Repository, UpdateResult} from "typeorm";
 import {Comment, CommentInput} from "./model";
 import {User} from "../user/model";
 import RateActionService from "../rate/service";
+import UserService from "../user/service";
 
 @Service()
 export default class CommentService {
@@ -11,25 +12,37 @@ export default class CommentService {
   @Inject()
   private rateActionService: RateActionService;
 
-  public getComment(commentId: number) {
-    return this.repository.findOne(commentId, {
+  @Inject()
+  private userService: UserService;
+
+  public async getComment(commentId: number): Promise<Comment> {
+    const comment = await this.repository.findOne(commentId, {
       relations: [
-        'author',
         'ratedUsers',
-        'ratedUsers.user',
       ],
     });
+    const author = await this.userService.getUser(comment.authorId);
+
+    return {
+      ...comment,
+      author,
+    };
   }
 
-  public createComment(postId: number, author: User, comment: CommentInput): Promise<Comment> {
+  public async createComment(postId: number, author: User, comment: CommentInput): Promise<Comment> {
     const createdComment = this.repository.create({
       ...comment,
       creationDate: new Date(),
       postId,
-      author,
+      authorId: author.id,
     });
 
-    return this.repository.save(createdComment);
+    const savedComment = await this.repository.save(createdComment);
+
+    return {
+      ...savedComment,
+      author,
+    };
   }
 
   public updateComment(comment: CommentInput): Promise<UpdateResult> {
@@ -42,7 +55,7 @@ export default class CommentService {
 
   public async rateComment(user: User, commentId: number, rateAction: boolean) {
     const comment = await this.getComment(commentId);
-    const existingRateAction = (comment.ratedUsers || []).find(rateUser => rateUser.user.id === user.id);
+    const existingRateAction = (comment.ratedUsers || []).find(rateUser => rateUser.userId === user.id);
 
     if (existingRateAction) {
       await this.rateActionService.switchCommentAction(existingRateAction);

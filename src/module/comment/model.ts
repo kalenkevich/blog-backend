@@ -36,8 +36,10 @@ export class Comment {
   @OneToMany(type => CommentRateUserAction, userAction => userAction.comment, {nullable: true, onDelete: 'CASCADE'})
   ratedUsers: CommentRateUserAction[];
 
-  @Field((type) => User)
-  @ManyToOne((type) => User)
+  @Column()
+  authorId: number;
+
+  @Field(type => User)
   author: User;
 
   @Column({type: "int", nullable: true})

@@ -1,6 +1,5 @@
 import {Field, ID, ObjectType} from "type-graphql";
 import {Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
-import {User} from "../user/model";
 import {Post} from "../post/model";
 import {Comment} from "../comment/model";
 
@@ -11,10 +10,9 @@ export class PostRateUserAction {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Field(type => User)
-  @ManyToOne(type => User)
-  @JoinColumn({name: "userId"})
-  user: User;
+  @Column()
+  @Field()
+  userId: number;
 
   @Field(type => Post)
   @ManyToOne(type => Post)
@@ -33,10 +31,9 @@ export class CommentRateUserAction {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Field(type => User)
-  @ManyToOne(type => User)
-  @JoinColumn({name: "userId"})
-  user: User;
+  @Column()
+  @Field()
+  userId: number;
 
   @Field(type => Comment)
   @ManyToOne(type => Comment)
