@@ -11,11 +11,15 @@ export default class AuthConnector implements ConnectorInterface {
   httpService: HttpService;
 
   getUser(token: string) {
-    return this.httpService.get(`${this.settings.AuthUrl}/authorize`, {
-      headers: {
-        Authorization: token
-      }
-    });
+    if (token) {
+      return this.httpService.get(`${this.settings.AuthUrl}/authorize`, {
+        headers: {
+          Authorization: token
+        }
+      });
+    }
+
+    return null;
   }
 
   async connect() {
