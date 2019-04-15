@@ -6,7 +6,7 @@ export default {
     'http://development.blog.kalenkevich.com',
     'http://localhost:8080',
   ],
-  AuthUrl: "https://auth-backend-development.herokuapp.com/graphql",
+  AuthUrl: "https://auth-backend-development.herokuapp.com",
   Database: {
     host: "ec2-54-75-232-114.eu-west-1.compute.amazonaws.com",
     port: 5432,
